@@ -1,129 +1,23 @@
 package com.ecmdeveloper.eds.model;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.ecmdeveloper.eds.model.constants.RequestMode;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class ExternalDataRequest {
-
-	/**
-	 * The symbolic name of the target external data store that contains the
-	 * property data.
-	 */
-	private String repositoryId;
-
-	/**
-	 * The globally unique identifier (GUID) or persistent identifier (PID) that
-	 * identifies the item that is being edited.
-	 */
-	private String objectId;
-
-	/**
-	 * One of the following request modes that indicates the reason that the
-	 * POST method is being called:
-	 * <ul>
-	 * <li>initialNewObject</li>
-	 * <li>initialExistingObject</li>
-	 * <li>inProgressChanges</li>
-	 * <li>finalNewObject</li>
-	 * <li>finalExistingObject</li>
-	 * </ul>
-	 */
-	private RequestMode requestMode;
-
-	/**
-	 * A string that indicates the state of the data that was returned by the
-	 * external data service. The request must include this identifier if the
-	 * requestMode parameter is set to one of these values:
-	 * <ul>
-	 * <li>inProgressChanges</li>
-	 * <li>finalNewObject</li>
-	 * <li>finalExistingObject</li>
-	 * </ul>
-	 */
-	private String externalDataIdentifier;
+public interface ExternalDataRequest {
 	
-	/**
-	 * An array that contains values for the properties that are defined for the
-	 * class or item type. For each property, the request contains the symbolic
-	 * name and the property value.
-	 */
-	private List<Property> properties;
+	public String getExternalDataIdentifier(); 
 
-	private Map<String,Property> propertyMap;
+	public String getObjectId() ;
+
+	public List<Property> getProperties();
+
+	public String getRepositoryId() ;
+
+	public RequestMode getRequestMode();
+
+	public Map<String, Object> getClientContext();
 	
-	/**
-	 * An array that contains a series of key value pairs that specify
-	 * contextual information for a specific class or item type. This parameter
-	 * is used to send information to an external data service when an IBM
-	 * Content Navigator user begins to add a document, add a folder, use an
-	 * entry template, or create a search.
-	 */
-	private Map<String, Object> clientContext;
-
-	public String getExternalDataIdentifier() {
-		return this.externalDataIdentifier;
-	}
-
-	public void setExternalDataIdentifier(String externalDataIdentifier) {
-		this.externalDataIdentifier = externalDataIdentifier;
-	}
-
-	public String getObjectId() {
-		return this.objectId;
-	}
-
-	public void setObjectId(String objectId) {
-		this.objectId = objectId;
-	}
-
-	public List<Property> getProperties() {
-		return this.properties;
-	}
-
-	public void setProperties(List<Property> properties) {
-		this.properties = properties;
-	}
-
-	public String getRepositoryId() {
-		return this.repositoryId;
-	}
-
-	public void setRepositoryId(String repositoryId) {
-		this.repositoryId = repositoryId;
-	}
-
-	public RequestMode getRequestMode() {
-		return this.requestMode;
-	}
-
-	public void setRequestMode(RequestMode requestMode) {
-		this.requestMode = requestMode;
-	}
-
-	public Map<String, Object> getClientContext() {
-		return clientContext;
-	}
-
-	public void setClientContext(Map<String, Object> clientContext) {
-		this.clientContext = clientContext;
-	}
-	
-	@JsonIgnore
-	public Map<String, Property> getProperty() {
-		if ( propertyMap == null ) {
-			initializePropertyMap();
-		}
-		return propertyMap;
-	}
-
-	private void initializePropertyMap() {
-		propertyMap = new HashMap<String, Property>();
-		for (Property property : properties) {
-			propertyMap.put(property.getSymbolicName(), property);
-		}
-	}
+	public Property getProperty(String name);
 }

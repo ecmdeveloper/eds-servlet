@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ecmdeveloper</groupId>
   <artifactId>eds-servlet</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <name>EDS servlet</name>
   <description>An API you can use to build an External Data Services servlet.</description>
   <dependencies>
@@ -27,6 +27,12 @@
 		<version>3.0.1</version>
     	<scope>provided</scope>
 	</dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>	
   </dependencies>
   <build>
     <plugins>

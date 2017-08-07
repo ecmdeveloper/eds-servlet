@@ -3,7 +3,6 @@ package com.ecmdeveloper.eds.servlet;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,21 +14,21 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.ecmdeveloper.eds.model.ExternalDataRequest;
 import com.ecmdeveloper.eds.model.ExternalDataResponse;
-import com.ecmdeveloper.eds.model.RequestHandler;
+import com.ecmdeveloper.eds.model.ObjectType;
+import com.ecmdeveloper.eds.model.impl.ExternalDataRequestImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Servlet implementation class UpdateObjectTypesServlet
  */
-public class AbstractEDSServlet extends HttpServlet {
+public abstract class AbstractEDSServlet extends HttpServlet {
 	
 	private static final String SOURCE_CLASS = "AbstractEDSServlet";
 
 	public static Logger logger = Logger.getLogger("com.ecmdeveloper.eds");
 	
 	private ObjectMapper mapper = new ObjectMapper();
-	private RequestHandler requestHandler;
 	
 	private static final long serialVersionUID = 1L;
        
@@ -42,14 +41,29 @@ public class AbstractEDSServlet extends HttpServlet {
         DateFormat formatter1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH); 
 		mapper.setDateFormat(formatter1);
 		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+		
+		mapper.addMixInAnnotations(ExternalDataRequest.class, ExternalDataRequestImpl.class);
     }
 
 	/**
+	 * Returns the names of the object types handled by this EDS implementation. The id of the
+	 * repository is passed as a parameter.
+	 * 
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().write( "The time is " + (new Date()).toString() );
-		System.out.println( "The time is " + (new Date()).toString() );
+		String repositoryId = request.getParameter("repositoryId");
+        mapper.writeValue(response.getWriter(), getObjectTypes(repositoryId));
+	}
+
+	private ObjectType[] getObjectTypes(String repositoryId) {
+		final String[] objectTypeNames = getObjectTypeNames();
+        final ObjectType[] objectTypes = new ObjectType[objectTypeNames.length];
+        int index = 0;
+        for ( String objectTypeName : getObjectTypeNames() ) {
+        	objectTypes[index++] = new ObjectType(objectTypeName);
+        }
+		return objectTypes;
 	}
 
 	/**
@@ -63,13 +77,20 @@ public class AbstractEDSServlet extends HttpServlet {
 			String objectType = request.getPathInfo().substring(request.getPathInfo().lastIndexOf("/") + 1 );
 			ExternalDataRequest dataRequest = mapper.readValue(request.getInputStream(), ExternalDataRequest.class);
 			ExternalDataResponse dataResponse = new ExternalDataResponse();
-			requestHandler.handleRequest(objectType, dataRequest, dataResponse);
 			dataResponse.setExternalDataIdentifier("EDS API");
+			handleRequest(objectType, dataRequest, dataResponse);
 			mapper.writeValue(response.getWriter(), dataResponse);
 
 			logger.exiting(SOURCE_CLASS, "doPost");
 		} catch (Exception e ) {
+			e.printStackTrace();
 			logger.log(Level.SEVERE, getServletName() +":doPost", e);
 		}
+	}
+	
+	public abstract void handleRequest(String objectType, ExternalDataRequest dataRequest, ExternalDataResponse dataResponse);
+	
+	public String[] getObjectTypeNames() {
+		return new String[0];
 	}
 }

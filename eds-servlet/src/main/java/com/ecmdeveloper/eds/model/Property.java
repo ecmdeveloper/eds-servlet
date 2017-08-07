@@ -136,10 +136,6 @@ public class Property implements ChoiceListContainer {
 		this.value = value;
 	}
 	
-	public void sayHello() {
-		System.out.println( "Property " + getDisplayMode() + " says hello!");
-	}
-
 	public void setLabel(String label) {
 		this.label = label;
 	}
