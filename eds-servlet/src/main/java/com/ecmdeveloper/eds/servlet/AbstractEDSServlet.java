@@ -16,6 +16,7 @@ import com.ecmdeveloper.eds.model.ExternalDataRequest;
 import com.ecmdeveloper.eds.model.ExternalDataResponse;
 import com.ecmdeveloper.eds.model.ObjectType;
 import com.ecmdeveloper.eds.model.impl.ExternalDataRequestImpl;
+import com.ecmdeveloper.eds.model.impl.ExternalDataResponseImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -75,8 +76,8 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 			logger.entering(SOURCE_CLASS, "doPost");
 			
 			String objectType = request.getPathInfo().substring(request.getPathInfo().lastIndexOf("/") + 1 );
-			ExternalDataRequest dataRequest = mapper.readValue(request.getInputStream(), ExternalDataRequest.class);
-			ExternalDataResponse dataResponse = new ExternalDataResponse();
+			ExternalDataRequest dataRequest = mapper.readValue(request.getInputStream(), ExternalDataRequestImpl.class);
+			ExternalDataResponse dataResponse = new ExternalDataResponseImpl();
 			dataResponse.setExternalDataIdentifier("EDS API");
 			handleRequest(objectType, dataRequest, dataResponse);
 			mapper.writeValue(response.getWriter(), dataResponse);

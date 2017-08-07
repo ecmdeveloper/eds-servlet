@@ -1,39 +1,17 @@
-/**
- * 
- */
 package com.ecmdeveloper.eds.model;
 
-import java.util.ArrayList;
-import java.util.List;
+public interface ExternalDataResponse {
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
-/**
- * @author Administrator
- *
- */
-@JsonInclude(Include.NON_NULL)
-public class ExternalDataResponse {
-
-	private String externalDataIdentifier;
-	public List<Property> properties = new ArrayList<Property>();
-
-	public void addProperty(Property property) {
-		properties.add(property);
-	}
+	void addProperty(Property property);
 
 	/**
 	 * @return the externalDataIdentifier
 	 */
-	public String getExternalDataIdentifier() {
-		return externalDataIdentifier;
-	}
+	String getExternalDataIdentifier();
 
 	/**
 	 * @param externalDataIdentifier the externalDataIdentifier to set
 	 */
-	public void setExternalDataIdentifier(String externalDataIdentifier) {
-		this.externalDataIdentifier = externalDataIdentifier;
-	}
+	void setExternalDataIdentifier(String externalDataIdentifier);
+
 }
