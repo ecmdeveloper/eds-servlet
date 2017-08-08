@@ -78,7 +78,6 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 			String objectType = request.getPathInfo().substring(request.getPathInfo().lastIndexOf("/") + 1 );
 			ExternalDataRequest dataRequest = mapper.readValue(request.getInputStream(), ExternalDataRequestImpl.class);
 			ExternalDataResponse dataResponse = new ExternalDataResponseImpl();
-			dataResponse.setExternalDataIdentifier("EDS API");
 			handleRequest(objectType, dataRequest, dataResponse);
 			mapper.writeValue(response.getWriter(), dataResponse);
 

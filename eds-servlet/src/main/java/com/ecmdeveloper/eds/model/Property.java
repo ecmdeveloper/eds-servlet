@@ -3,178 +3,192 @@ package com.ecmdeveloper.eds.model;
 import java.util.List;
 
 import com.ecmdeveloper.eds.model.constants.DisplayMode;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-@JsonInclude(Include.NON_NULL)
-public class Property implements ChoiceListContainer {
-	
-   	private String symbolicName;
-	private Object value;
-	private String customValidationError;
-	private List<Integer> customInvalidItems;
-	private DisplayMode displayMode;
-	private Boolean required;
-	private Boolean hidden;
-	private Object maxValue;
-	private Object minValue;
-	private Integer maxLength;
-	private ChoiceList choiceList;
-   	private Boolean hasDependentProperties;
-	private String label;
-	private String format;
-	private String formatDescription;
-	
-   	@Override
-	public String toString() {
-		return getSymbolicName();
-	}
+/**
+ * The property interface. This interface is used to configure the behavior of a specific property. 
+ * Once a property is modified, it has to be added to the ExternalDataResponse to be effective.
+ * 
+ * @author Ricardo Belfor
+ *
+ */
+public interface Property {
 
-	public ChoiceList getChoiceList() {
-		return this.choiceList;
-	}
- 	
-	public void setChoiceList(ChoiceList choiceList) {
-		this.choiceList = choiceList;
-	}
-	
- 	public List<Integer> getCustomInvalidItems() {
-		return this.customInvalidItems;
-	}
- 	
-	public void setCustomInvalidItems(List<Integer> customInvalidItems) {
-		this.customInvalidItems = customInvalidItems;
-	}
-	
- 	public String getCustomValidationError() {
-		return this.customValidationError;
-	}
- 	
-	public void setCustomValidationError(String customValidationError) {
-		this.customValidationError = customValidationError;
-	}
-	
- 	public DisplayMode getDisplayMode() {
-		return this.displayMode;
-	}
- 	
-	public void setDisplayMode(DisplayMode displayMode) {
-		this.displayMode = displayMode;
-	}
-	
- 	public Boolean getHasDependentProperties() {
-		return this.hasDependentProperties;
-	}
- 	
-	public void setHasDependentProperties(Boolean hasDependentProperties) {
-		this.hasDependentProperties = hasDependentProperties;
-	}
-	
- 	public Boolean getHidden() {
-		return this.hidden;
-	}
- 	
-	public void setHidden(Boolean hidden) {
-		this.hidden = hidden;
-	}
-	
- 	public Integer getMaxLength() {
-		return this.maxLength;
-	}
- 	
-	public void setMaxLength(Integer maxLength) {
-		this.maxLength = maxLength;
-	}
-	
- 	public Object getMaxValue() {
-		return this.maxValue;
-	}
- 	
-	public void setMaxValue(Object maxValue) {
-		this.maxValue = maxValue;
-	}
-	
- 	public Object getMinValue() {
-		return this.minValue;
-	}
- 	
-	public void setMinValue(Object minValue) {
-		this.minValue = minValue;
-	}
-	
- 	public Boolean getRequired() {
-		return this.required;
-	}
- 	
-	public void setRequired(Boolean required) {
-		this.required = required;
-	}
-	
+	/**
+	 * Returns the value of this property.
+	 * @return the value of the property.
+	 */
+	Object getValue();
+
+	/**
+	 * Sets the value of this property.
+	 * @param value the new value of this property.
+	 */
+	void setValue(Object value);
+
+	/**
+	 * Returns the display mode of the property.
+	 * @return the display mode of this property.
+	 */
+	DisplayMode getDisplayMode();
+
+	/**
+	 * Sets the display mode of the property
+	 * @param displayMode
+	 */
+	void setDisplayMode(DisplayMode displayMode);
+
+	/**
+	 * Returns the choice objects of the property.
+	 * @return choice object.
+	 */
+	ChoiceList getChoiceList();
+
+	/**
+	 * Sets the choice objects of the property.
+	 * @param choiceList the new value.
+	 */
+	void setChoiceList(ChoiceList choiceList);
+
+	/** 
+	 * Returns a collection containing the indices of the invalid items of a multi-value property.
+	 * @return an collection.
+	 */
+	List<Integer> getCustomInvalidItems();
+
+	/**
+	 * Sets a collection containing the indices of the invalid items of a multi-value property.
+	 * @param customInvalidItems the collection.
+	 */
+	void setCustomInvalidItems(List<Integer> customInvalidItems);
+
+	/**
+	 * Returns the description why a property value is invalid.
+	 * @return the description.
+	 */
+	String getCustomValidationError();
+
+	/**
+	 * Sets the description why a property value is invalid.
+	 * @param customValidationError the new value.
+	 */
+	void setCustomValidationError(String customValidationError);
+
+	/**
+	 * Returns a boolean value indicating if the value of this property controls 
+	 * the value of other properties.
+	 * @return the boolean value.
+	 */
+	Boolean getHasDependentProperties();
+
+	/**
+	 * Sets a boolean value indicating if the value of this property controls 
+	 * the value of other properties.
+	 * @param hasDependentProperties the new value.
+	 */
+	void setHasDependentProperties(Boolean hasDependentProperties);
+
+	/**
+	 * Returns a boolean value indicating if the property is hidden.
+	 * @return the boolean value.
+	 */
+	Boolean getHidden();
+
+	/**
+	 * Sets a boolean value indicating if the property is hidden. 
+	 * @param hidden the new value.
+	 */
+	void setHidden(Boolean hidden);
+
+	/**
+	 * Returns the maximum length of the property.
+	 * @return the maximum length.
+	 */
+	Integer getMaxLength();
+
+	/**
+	 * Set the maximum lenght of the property.
+	 * @param maxLength the new value.
+	 */
+	void setMaxLength(Integer maxLength);
+
+	/**
+	 * Returns the overridden maximum value of the property.
+	 * @return the maximum value.
+	 */
+	Object getMaxValue();
+
+	/**
+	 * Set the overridden maximum value of the property.
+	 * @param maxValue the new value.
+	 */
+	void setMaxValue(Object maxValue);
+
+	/**
+	 * Returns the overridden minimum value of the property.
+	 * @return the minimum value.
+	 */
+	Object getMinValue();
+
+	/**
+	 * Sets the overridden minimum value of the property.
+	 * @param minValue
+	 */
+	void setMinValue(Object minValue);
+
+	/**
+	 * Returns a boolean value indicating if the property is required.
+	 * @return the boolean value.
+	 */
+	Boolean getRequired();
+
+	/**
+	 * Sets a boolean value indicating if the property is required.
+	 * @param required the new value.
+	 */
+	void setRequired(Boolean required);
+
 	/**
 	 * Returns the symbolic name of the property. 
-	 * 
 	 * @return the symbolic name.
 	 */
- 	public String getSymbolicName() {
-		return this.symbolicName;
-	}
-
- 	/**
- 	 * Sets the symbolic name of the property. 
- 	 * 
- 	 * @param symbolicName the symbolic name.
- 	 */
-	public void setSymbolicName(String symbolicName) {
-		this.symbolicName = symbolicName;
-	}
-	
- 	public Object getValue() {
-		return this.value;
-	}
- 	
-	public void setValue(Object value) {
-		this.value = value;
-	}
-	
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
-	public String getLabel() {
-		return label;
-	}
+	String getSymbolicName();
 
 	/**
-	 * The description that is displayed in a tooltip if the user enters a format 
+	 * Sets the label to put in front of the property editor <b>(Content Navigator only)</b>
+	 * @param label the new value.
+	 */
+	void setLabel(String label);
+
+	/**
+	 * Returns the label to put in front of the property editor <b>(Content Navigator only)</b>.
+	 * @return the label.
+	 */
+	String getLabel();
+
+	/**
+	 * Returns the description that is displayed in a tooltip if the user enters a format 
 	 * that does not match the expression specified in the format parameter.
-	 * 
 	 * @return the format description
 	 */
-	public String getFormatDescription() {
-		return formatDescription;
-	}
+	String getFormatDescription();
 
 	/**
-	 * The description that is displayed in a tooltip if the user enters a format 
-	 * that does not match the expression specified in the format parameter.
-	 * 
-	 * @param formatDescription the format description to set
+	 * Sets the description that is displayed in a tooltip if the user enters a format 
+	 * that does not match the expression specified in the format parameter 
+	 * <b>(Content Navigator only)</b>.
+	 * @param formatDescription the new value.
 	 */
-	public void setFormatDescription(String formatDescription) {
-		this.formatDescription = formatDescription;
-	}
+	void setFormatDescription(String formatDescription);
 
 	/**
+	 * Returns a regular expression describing the format of the property <b>(Content Navigator only)</b>.
 	 * @return the format
 	 */
-	public String getFormat() {
-		return format;
-	}
+	String getFormat();
 
 	/**
-	 * @param format the format to set
+	 * Sets a regular expression describing the format of the property <b>(Content Navigator only)</b>
+	 * @param format the new value.
 	 */
-	public void setFormat(String format) {
-		this.format = format;
-	}
+	void setFormat(String format);
 }

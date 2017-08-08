@@ -13,7 +13,7 @@ import com.ecmdeveloper.eds.model.constants.RequestMode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * The MixIn class to handle external data request deserialization.
+ * The class to handle external data request deserialization.
  * 
  * @author Ricardo Belfor
  *
@@ -62,7 +62,7 @@ public class ExternalDataRequestImpl implements ExternalDataRequest {
 	 * class or item type. For each property, the request contains the symbolic
 	 * name and the property value.
 	 */
-	private List<Property> properties;
+	private List<PropertyImpl> properties;
 
 	private Map<String,Property> propertyMap;
 	
@@ -93,11 +93,11 @@ public class ExternalDataRequestImpl implements ExternalDataRequest {
 		this.objectId = objectId;
 	}
 
-	public List<Property> getProperties() {
+	public List<PropertyImpl> getProperties() {
 		return this.properties;
 	}
 
-	public void setProperties(List<Property> properties) {
+	public void setProperties(List<PropertyImpl> properties) {
 		this.properties = properties;
 	}
 

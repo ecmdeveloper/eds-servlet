@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class ExternalDataResponseImpl implements ExternalDataResponse {
 
-	private String externalDataIdentifier;
+	private String externalDataIdentifier = "EDS API";
 	public List<Property> properties = new ArrayList<Property>();
 
 	/* (non-Javadoc)
