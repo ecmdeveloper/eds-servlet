@@ -35,6 +35,7 @@ public class ExternalDataRequestImpl implements ExternalDataRequest {
 	private List<PropertyImpl> properties;
 	private Map<String,Property> propertyMap;
 	private Map<String, Object> clientContext;
+	private String objectType;
 
 	@Override
 	public String getExternalDataIdentifier() {
@@ -54,6 +55,15 @@ public class ExternalDataRequestImpl implements ExternalDataRequest {
 		this.objectId = objectId;
 	}
 
+	@Override
+	public String getObjectType() {
+		return objectType;
+	}
+
+	public void setObjectType(String objectType) {
+		this.objectType = objectType;
+	}
+	
 	public List<PropertyImpl> getProperties() {
 		return this.properties;
 	}

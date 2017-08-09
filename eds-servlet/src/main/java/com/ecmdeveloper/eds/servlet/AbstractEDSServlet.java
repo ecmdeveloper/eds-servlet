@@ -76,9 +76,10 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 			logger.entering(SOURCE_CLASS, "doPost");
 			
 			String objectType = request.getPathInfo().substring(request.getPathInfo().lastIndexOf("/") + 1 );
-			ExternalDataRequest dataRequest = mapper.readValue(request.getInputStream(), ExternalDataRequestImpl.class);
+			ExternalDataRequestImpl dataRequest = mapper.readValue(request.getInputStream(), ExternalDataRequestImpl.class);
+			dataRequest.setObjectType(objectType);
 			ExternalDataResponse dataResponse = new ExternalDataResponseImpl();
-			handleRequest(objectType, dataRequest, dataResponse);
+			handleRequest(dataRequest, dataResponse);
 			mapper.writeValue(response.getWriter(), dataResponse);
 
 			logger.exiting(SOURCE_CLASS, "doPost");
@@ -88,7 +89,7 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 		}
 	}
 	
-	public abstract void handleRequest(String objectType, ExternalDataRequest dataRequest, ExternalDataResponse dataResponse);
+	public abstract void handleRequest(ExternalDataRequest dataRequest, ExternalDataResponse dataResponse);
 	
 	public String[] getObjectTypeNames() {
 		return new String[0];

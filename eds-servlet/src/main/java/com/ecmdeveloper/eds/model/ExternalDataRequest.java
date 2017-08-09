@@ -17,8 +17,14 @@ public interface ExternalDataRequest extends Iterable<Property> {
 	 * identifies the item that is being edited.
 	 * @return the identifier.
 	 */
-	public String getObjectId() ;
+	public String getObjectId();
 
+	/**
+	 * The object type of the item that is being edited.
+	 * @return object type.
+	 */
+	public String getObjectType();
+	
 	/**
 	 * The name of the target external data store that contains the property data.
 	 * @return the repository id.
