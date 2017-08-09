@@ -49,5 +49,11 @@ public class ExternalDataRequestTest {
 		
 		assertNull(dataRequest.getObjectId());
 		
+		assertNotNull(dataRequest.getClientContext() );
+		assertEquals("TestSolution", dataRequest.getClientContext().get("currentSolution"));
+		
+		for (Property p : dataRequest) {
+			System.out.println(p.getSymbolicName());
+		}
 	}
 }
