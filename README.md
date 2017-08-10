@@ -1,5 +1,5 @@
 # EDS servlet
-This is a library you can use to build an External Data Services servlet IBM FileNet
+This is a library you can use to build an External Data Services servlet for IBM FileNet
 Case Manager and IBM FileNet Content Navigator.
 
 ## Getting started
@@ -46,7 +46,7 @@ public class EDSExampleServlet extends AbstractEDSServlet {
 
 The ```handleRequest()``` method is where all the magic happens. This is where the actual implementation
 of your EDS service should take place. The incoming parameter ```dataRequest``` contains information
-about the request that is made, and the `dataResponse` should be filled up by the implementation, describing the behavior of the different properties. You can use the ```getProperty()``` with the symbolic name of the property to get a `Property` object. This object contains several methods to describe the required behavior.
+about the request that is made, and the `dataResponse` object should be filled up by the implementation, describing the behavior of the different properties. You can use the ```getProperty()``` with the symbolic name of the property to get a `Property` object. This object contains several methods to describe the required behavior.
 
 ## A simple example
 
@@ -72,7 +72,7 @@ if (dataRequest.getObjectType().equals("Customer") ) {
 }
 ```
 Because requests to EDS are made for different object types of the solution, you
-first have to check that we are dealing with the `Customer` case type. Next the
+first have to check that you are dealing with the `Customer` case type. Next the
 property object is fetched from the dataRequest object. The `RequestMode` gives you
 an indication of the context of the call that is being made. In the first part
 the user started creating a new case, resulting in a `RequestMode` value of `initialNewObject`.
@@ -82,4 +82,13 @@ in a `RequestMode` value of `initialExistingObject`.
 Now that the context is determined, we can start to modify the `Property` object, making
 it required and editable on create and readonly afterwards. At
 the end there is one important thing: the property must be added to the dataResponse
-object.
+object. This is all it takes to build a simple EDS implementation.
+
+## Reference
+
+### ExternalDataRequest
+
+Method | Description
+-------|------------
+`public String getObjectId()` | The globally unique identifier (GUID) or persistent identifier (PID) that identifies the item that is being edited.
+public Map<String, Property> getProperty() | An map that contains values for the properties that are defined for the class or item type. For each property, the request contains the symbolic name and the property value.
