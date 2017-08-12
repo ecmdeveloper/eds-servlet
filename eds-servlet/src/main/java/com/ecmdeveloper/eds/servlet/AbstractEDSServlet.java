@@ -58,10 +58,10 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 	}
 
 	private ObjectType[] getObjectTypes(String repositoryId) {
-		final String[] objectTypeNames = getObjectTypeNames();
+		final String[] objectTypeNames = getObjectTypeNames(repositoryId);
         final ObjectType[] objectTypes = new ObjectType[objectTypeNames.length];
         int index = 0;
-        for ( String objectTypeName : getObjectTypeNames() ) {
+        for ( String objectTypeName : objectTypeNames ) {
         	objectTypes[index++] = new ObjectType(objectTypeName);
         }
 		return objectTypes;
@@ -74,6 +74,7 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 		
 		try {
 			logger.entering(SOURCE_CLASS, "doPost");
+			logger.fine(request.getPathInfo());
 			
 			String objectType = request.getPathInfo().substring(request.getPathInfo().lastIndexOf("/") + 1 );
 			ExternalDataRequestImpl dataRequest = mapper.readValue(request.getInputStream(), ExternalDataRequestImpl.class);
@@ -91,7 +92,7 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 	
 	public abstract void handleRequest(ExternalDataRequest dataRequest, ExternalDataResponse dataResponse);
 	
-	public String[] getObjectTypeNames() {
+	public String[] getObjectTypeNames(String repositoryId) {
 		return new String[0];
 	}
 }
