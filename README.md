@@ -84,11 +84,56 @@ it required and editable on create and readonly afterwards. At
 the end there is one important thing: the property must be added to the dataResponse
 object. This is all it takes to build a simple EDS implementation.
 
+See the complete class for this example  [here](eds-servlet/eds-servlet-example/src/main/java/com/ecmdeveloper/eds/example/servlet/EDSExampleServlet.java)
+
+## A simple Content Navigator examples
+
+The Content Navigator service is a little bit more involved. In this case you have to
+provide an implementation for the `getObjectTypeNames()` method. This method has the
+following signature:
+```java
+public String[] getObjectTypeNames(String repositoryId)
+```
+The implementation of this method should return a string array containing all the object types
+you want to be handled by the service. For folders and documents this are simply
+the symbolic names of the classes. But the service can also be used for stepprocessors and
+search template. Check the documentation what the object type names are in this case.
+
+In this example we will add validation to the `Email` class, so the implementation looks
+like this, returning an array with only one element:
+
+```java
+@Override
+public String[] getObjectTypeNames(String repositoryId) {
+	return new String[] {"Email"};
+}
+```
+In this example we check if the `From` property contains a valid e-mail address. The
+Internet has a lot of regular expressions to check this. In this case we choose the
+version on the [www.w3resource.com](http://www.w3resource.com/javascript/form/email-validation.php) site. This leads to the following implementation of the `handleRequest()` method (for simplicity
+some checks are skipped):
+
+```java
+@Override
+public void handleRequest(ExternalDataRequest dataRequest, ExternalDataResponse dataResponse) {
+	Property from = dataRequest.getProperty("From");
+	from.setValue("john.doe@example.com");
+	from.setFormat("^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$");
+	from.setFormatDescription("e-mail address");
+	dataResponse.addProperty(from);
+}
+```
+
 ## Reference
 
 ### ExternalDataRequest
 
 Method | Description
 -------|------------
-`public String getObjectId()` | The globally unique identifier (GUID) or persistent identifier (PID) that identifies the item that is being edited.
-public Map<String, Property> getProperty() | An map that contains values for the properties that are defined for the class or item type. For each property, the request contains the symbolic name and the property value.
+`String getObjectId()`|The globally unique identifier (GUID) or persistent identifier (PID) that identifies the item that is being edited.
+`String getObjectId()`|The object type of the item that is being edited.
+`String getRepositoryId()`|The name of the target external data store that contains the property data.
+`RequestMode getRequestMode()` | Returns the  reason that the service is being called. The value can be one of these value: `initialNewObject`, `initialExistingObject`, `inProgressChanges`,`finalNewObject` or `finalExistingObject`
+` Map<String, Object> getClientContext()`|An array that contains a series of key value pairs that specify contextual information for a specific class or item type.
+`Property getProperty(String name)`|Returns a specific property identified by it's symbolic name
+`String getExternalDataIdentifier()`|A string that indicates the state of the data that was returned by the external data service. The request must include this identifier if the `requestMode` parameter is set to one of these values: `inProgressChanges`, `finalNewObject` or `finalExistingObject`
