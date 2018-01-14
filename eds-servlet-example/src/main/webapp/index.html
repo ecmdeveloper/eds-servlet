@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>EDS Servlet</title>
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"  integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+	   
+<style>
+ 
+#toolbar {
+	padding: 4px;
+}
+
+.header {
+ 	padding: 5px;
+ }
+ 
+ body {
+	font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+	font-size: 14px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 20px;
+}
+
+body {
+   background-color: white;
+   margin: 40px;
+   }
+pre {
+   background-color: mintcream;
+   border: 1px solid silver;
+   padding: 10px 20px;
+   }
+.json-key {
+   color: brown;
+   }
+.json-value {
+   color: navy;
+   }
+.json-string {
+   color: olive;
+   }
+   
+ </style>
+ 
+<script>
+$(function() {
+$( "#beginning" ).button({text: false, icons: { primary: "ui-icon-seek-start"} });
+$( "#rewind" ).button({ text: false, icons: { primary: "ui-icon-seek-prev"} });
+$( "#forward" ).button({ text: false, icons: { primary: "ui-icon-seek-next"} });
+$( "#end" ).button({ text: false, icons: { primary: "ui-icon-seek-end"} });
+});
+</script> 
+</head>
+
+<body>
+
+<div id="pingInfo" class="ui-widget-header ui-corner-all header">No ping info!</div>
+<p>
+<div id="toolbar" class="ui-widget-header ui-corner-all header">
+<span>Get Data &nbsp;&nbsp;</span>
+<button id="beginning">go to beginning</button>
+<button id="rewind">rewind</button>
+<button id="forward">fast forward</button>
+<button id="end">go to end</button>
+</div>
+<p>
+<div id="timestamp" class="ui-widget-header ui-corner-all header">No data</div>
+
+<p>
+<div id="tabs">
+  <ul>
+    <li><a href="#tabs-1">Response</a></li>
+    <li><a href="#tabs-2">Request</a></li>
+    <li><a href="#tabs-3">Console</a></li>
+  </ul>
+  <div id="tabs-1">
+	<pre><code id="responseData"></code></pre>
+  </div>
+  <div id="tabs-2">
+	<pre><code id="requestData"></code></pre>
+  </div>
+  <div id="tabs-3">
+    <p>TODO</p>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+var currentIndex = 0;
+
+function getInfoFromServer() {
+$.ajax({
+  type: "GET",
+  url: "ping/" + currentIndex,
+  success: postToPage});
+}
+
+function getPingInfoFromServer() {
+$.ajax({
+  type: "GET",
+  url: "ping",
+  success: function(data) {
+  	$('#pingInfo').html(data);
+  } });
+}
+
+function postToPage(data, status) {
+	var jsonData = JSON.parse(data);
+	$('#responseData').html(jsonPrettyPrint.toHtml(jsonData.response));
+	$('#requestData').html(jsonPrettyPrint.toHtml(jsonData.request));
+	$('#timestamp').html( jsonData.timestamp );
+}
+
+var jsonPrettyPrint = {
+   replacer: function(match, pIndent, pKey, pVal, pEnd) {
+      var key = '<span class=json-key>';
+      var val = '<span class=json-value>';
+      var str = '<span class=json-string>';
+      var r = pIndent || '';
+      if (pKey)
+         r = r + key + pKey.replace(/[": ]/g, '') + '</span>: ';
+      if (pVal)
+         r = r + (pVal[0] == '"' ? str : val) + pVal + '</span>';
+      return r + (pEnd || '');
+      },
+   toHtml: function(obj) {
+      var jsonLine =
+         /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/mg;
+      return JSON.stringify(obj, null, 3)
+         .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
+         .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+         .replace(jsonLine, jsonPrettyPrint.replacer);
+      }
+   };
+   
+$(document).ready(function() {
+
+$( function() {
+    $( "#tabs" ).tabs();
+  } );
+
+$( "#beginning" ).on("click", function() {
+	currentIndex = 9;
+	getInfoFromServer();
+});
+
+$( "#rewind" ).on("click", function() {
+	currentIndex = Math.min(9, ++currentIndex );
+	getInfoFromServer();
+});
+
+$( "#forward" ).on("click", function() {
+	currentIndex = Math.max(0, --currentIndex );
+	getInfoFromServer();
+});
+$( "#end" ).on("click", function() {
+	currentIndex = 0;
+	getInfoFromServer();
+});
+	
+getPingInfoFromServer();
+	
+});
+
+</script>
+
+</body>
+
+</html>
