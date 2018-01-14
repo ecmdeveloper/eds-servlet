@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 public class ErrorResponse {
 
-//	private String bla;
-	
 	private final UserMessage userMessage;
 	private final UnderlyingDetails underlyingDetails;
 	
