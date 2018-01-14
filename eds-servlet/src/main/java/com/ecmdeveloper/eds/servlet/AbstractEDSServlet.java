@@ -25,7 +25,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
- * Servlet implementation class UpdateObjectTypesServlet
+ * An abstract servlet implementation handling all the internals of EDS 
+ * processing.
+ * 
+ * @author Ricardo Belfor
  */
 public abstract class AbstractEDSServlet extends HttpServlet {
 	
@@ -62,17 +65,13 @@ public abstract class AbstractEDSServlet extends HttpServlet {
   
 	/**
 	 * Returns the names of the object types handled by this EDS implementation. The id of the
-	 * repository is passed as a parameter.
+	 * repository is passed as a parameter. Also handles the requests from the ping page.
 	 * 
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		
-		System.out.println("=======> " + request.getContextPath());
-		System.out.println("=======> " + request.getPathInfo() );
+
 		String servletPath = request.getServletPath();
-		System.out.println("=======> " + servletPath);
 		
 		if ("/types".equals( servletPath ) ) {
 			String repositoryId = request.getParameter("repositoryId");
@@ -117,36 +116,37 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		ExternalDataRequestImpl dataRequest = null;
+
 		try {
 			logger.entering(SOURCE_CLASS, "doPost");
 			logger.fine(request.getPathInfo());
 			
 			String objectType = request.getPathInfo().substring(request.getPathInfo().lastIndexOf("/") + 1 );
-			ExternalDataRequestImpl dataRequest = mapper.readValue(request.getInputStream(), ExternalDataRequestImpl.class);
+			dataRequest = mapper.readValue(request.getInputStream(), ExternalDataRequestImpl.class);
 			dataRequest.setObjectType(objectType);
 			ExternalDataResponse dataResponse = new ExternalDataResponseImpl();
 			handleRequest(dataRequest, dataResponse);
 			
 			addTrace(dataRequest, dataResponse);
-			
-			
 			mapper.writeValue(response.getWriter(), dataResponse);
 
 			logger.exiting(SOURCE_CLASS, "doPost");
 		} catch (Exception e ) {
 			response.sendError(500);
-		    mapper.writeValue(response.getWriter(), getErrorResponse(e) );
+		    ErrorResponse errorResponse = getErrorResponse(e);
+			addTrace(dataRequest, errorResponse);
+			mapper.writeValue(response.getWriter(), errorResponse );
 			logger.log(Level.SEVERE, getServletName() +":doPost", e);
 		}
 	}
-
 	
-	private void addTrace(ExternalDataRequestImpl dataRequest,
-			ExternalDataResponse dataResponse) throws JsonProcessingException {
+	private void addTrace(ExternalDataRequest dataRequest,
+			Object dataResponse) throws JsonProcessingException {
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
 		
-		String lastResponse = "{ \"request\": " + mapper.writeValueAsString(dataRequest) + 
+		String lastResponse = "{ \"request\": " + mapper.writeValueAsString(dataRequest == null? "{}" : dataRequest ) + 
 							", \"response\": " + mapper.writeValueAsString(dataResponse) +
 							", \"timestamp\": \"" + dataRequest.getObjectType() + " at " + dateFormat.format(new Date() ) + "\"" +
 							"}";
@@ -168,6 +168,12 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 		return errorResponse;
 	}
 	
+	/**
+	 * Handles the requests to the External Data Server. Subclasses should implement this method.
+	 * 
+	 * @param dataRequest the object containing data request.
+	 * @param dataResponse the object receiving the data response.
+	 */
 	public abstract void handleRequest(ExternalDataRequest dataRequest, ExternalDataResponse dataResponse);
 	
 	public String[] getObjectTypeNames(String repositoryId) {
