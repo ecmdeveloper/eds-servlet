@@ -1,6 +1,9 @@
 package com.ecmdeveloper.eds.model;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class ChoiceList{
    	private List<Choice> choices;
@@ -17,5 +20,13 @@ public class ChoiceList{
 	}
 	public void setDisplayName(String displayName){
 		this.displayName = displayName;
+	}
+	
+	@JsonIgnore
+	public void add(String... values) {
+		choices = new ArrayList<Choice>();
+		for (String value : values) {
+			choices.add( new Choice(value) );
+		}
 	}
 }
