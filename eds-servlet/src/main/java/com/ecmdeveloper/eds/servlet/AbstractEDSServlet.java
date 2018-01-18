@@ -153,7 +153,7 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 		
 		traceList.addFirst(lastResponse);
 		if ( traceList.size() > TRACE_LIST_SIZE ) {
-			traceList.removeFirst();
+			traceList.removeLast();
 		}
 	}
 
