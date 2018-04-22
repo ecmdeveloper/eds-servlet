@@ -54,6 +54,7 @@ $( "#beginning" ).button({text: false, icons: { primary: "ui-icon-seek-start"} }
 $( "#rewind" ).button({ text: false, icons: { primary: "ui-icon-seek-prev"} });
 $( "#forward" ).button({ text: false, icons: { primary: "ui-icon-seek-next"} });
 $( "#end" ).button({ text: false, icons: { primary: "ui-icon-seek-end"} });
+$( "#play" ).button({ text: false, icons: { primary: "ui-icon-play"} });
 });
 </script> 
 </head>
@@ -63,11 +64,13 @@ $( "#end" ).button({ text: false, icons: { primary: "ui-icon-seek-end"} });
 <div id="pingInfo" class="ui-widget-header ui-corner-all header">No ping info!</div>
 <p>
 <div id="toolbar" class="ui-widget-header ui-corner-all header">
-<span>Get Data &nbsp;&nbsp;</span>
+<span>Tracing &nbsp;&nbsp;</span>
 <button id="beginning">go to beginning</button>
 <button id="rewind">rewind</button>
 <button id="forward">fast forward</button>
 <button id="end">go to end</button>
+&nbsp;
+<button id="play">play</button>
 </div>
 <p>
 <div id="timestamp" class="ui-widget-header ui-corner-all header">No data</div>
@@ -77,7 +80,9 @@ $( "#end" ).button({ text: false, icons: { primary: "ui-icon-seek-end"} });
   <ul>
     <li><a href="#tabs-1">Response</a></li>
     <li><a href="#tabs-2">Request</a></li>
+<!-- 
     <li><a href="#tabs-3">Console</a></li>
+ -->
   </ul>
   <div id="tabs-1">
 	<pre><code id="responseData"></code></pre>
@@ -85,9 +90,11 @@ $( "#end" ).button({ text: false, icons: { primary: "ui-icon-seek-end"} });
   <div id="tabs-2">
 	<pre><code id="requestData"></code></pre>
   </div>
+ <!--  
   <div id="tabs-3">
     <p>TODO</p>
   </div>
+ -->
 </div>
 
 
@@ -164,11 +171,17 @@ $( "#end" ).on("click", function() {
 	currentIndex = 0;
 	getInfoFromServer();
 });
-	
-getPingInfoFromServer();
-	
-});
 
+$( "#play").on("click",function() {
+      var options;
+      if ( $( this ).text().trim() === "play" ) {
+        options = {label: "stop", icons: {primary: "ui-icon-stop"}};
+      } else {
+        options = {label: "play",icons: {primary: "ui-icon-play"} };
+      }
+      $( this ).button( "option", options );
+});
+    	
 </script>
 
 </body>
