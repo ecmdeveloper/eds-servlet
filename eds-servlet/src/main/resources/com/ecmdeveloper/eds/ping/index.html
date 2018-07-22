@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>EDS Servlet</title>
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"  integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+<style>
+
+#toolbar {
+	padding: 4px;
+}
+
+.header {
+ 	padding: 5px;
+ }
+
+ body {
+	font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+	font-size: 14px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 20px;
+}
+
+body {
+   background-color: white;
+   margin: 20px;
+}
+
+pre {
+   background-color: mintcream;
+   border: 1px solid silver;
+   padding: 10px 20px;
+}
+.json-key {
+   color: brown;
+}
+
+.json-value {
+   color: navy;
+}
+.json-string {
+   color: olive;
+}
+
+* {
+	 box-sizing: border-box;
+}
+
+ /* Create two equal columns that floats next to each other */
+ .column-1 {
+     float: left;
+     width: 20%;
+ }
+
+ .column-2 {
+     float: left;
+     width: 80%;
+     padding: 15px;
+ }
+
+ /* Clear floats after the columns */
+ .row:after {
+     content: "";
+     display: table;
+     clear: both;
+ }
+
+	#selectable .ui-selecting { background: #FECA40; }
+	#selectable .ui-selected { background: #e9e9e9; font-weight: bold;}
+	#selectable { list-style-type: none; margin: 0; padding: 0; width: 90%; }
+	#selectable li { margin: 3px; padding: 0.4em;  box-sizing: content-box; width: 100%}
+
+ </style>
+
+<script>
+$(function() {
+$( "#play" ).button({ text: true });
+});
+</script>
+</head>
+
+<body>
+
+<div id="pingInfo" class="ui-widget-header ui-corner-all header">No ping info!</div>
+<p>
+<div id="toolbar" class="ui-widget-header ui-corner-all header">
+<span>Tracing:&nbsp;&nbsp;</span>&nbsp;<button id="play">Start</button>&nbsp;&nbsp;<span id="traceStatus">Not started<span>
+</div>
+
+<div class="row">
+<div class="column-1">
+	<ul id="list">
+	</ul>
+	<ol id="selectable" class="ui-selectable">
+	</ol>
+</div>
+<div class="column-2">
+
+<div id="timestamp" class="ui-widget-header ui-corner-all header">No data</div>
+
+<p>
+	<div id="tabs">
+	  <ul>
+	    <li><a href="#tabs-1">Response</a></li>
+	    <li><a href="#tabs-2">Request</a></li>
+	  </ul>
+	  <div id="tabs-1">
+		<pre><code id="responseData"></code></pre>
+	  </div>
+	  <div id="tabs-2">
+		<pre><code id="requestData"></code></pre>
+	  </div>
+	</div>
+</div>
+</div>
+
+<script type="text/javascript">
+
+function getInfoFromServer(currentIndex) {
+$.ajax({
+  type: "GET",
+  url: "ping/" + currentIndex,
+  success: postToPage});
+}
+
+function getPingInfoFromServer() {
+$.ajax({
+  type: "GET",
+  url: "ping/info",
+  success: updatePageData
+  });
+}
+
+function updatePageData(pingInfo) {
+	var dataObject = JSON.parse(pingInfo);
+	$('#pingInfo').html(dataObject.startTimeInfo);
+	$("#traceStatus").html(dataObject.traceInfo);
+	$( '#play' ).button( "option", {label: dataObject.traceStarted? "Stop": "Start"} );
+}
+
+function postToPage(data, status) {
+	var jsonData = JSON.parse(data);
+	$('#responseData').html(jsonPrettyPrint.toHtml(JSON.parse(jsonData.response)) );
+	$('#requestData').html(jsonPrettyPrint.toHtml(JSON.parse(jsonData.request)) );
+	$('#timestamp').html( jsonData.timestamp );
+}
+
+var jsonPrettyPrint = {
+   replacer: function(match, pIndent, pKey, pVal, pEnd) {
+      var key = '<span class=json-key>';
+      var val = '<span class=json-value>';
+      var str = '<span class=json-string>';
+      var r = pIndent || '';
+      if (pKey)
+         r = r + key + pKey.replace(/[": ]/g, '') + '</span>: ';
+      if (pVal)
+         r = r + (pVal[0] == '"' ? str : val) + pVal + '</span>';
+      return r + (pEnd || '');
+      },
+   toHtml: function(obj) {
+      var jsonLine =
+         /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/mg;
+      return JSON.stringify(obj, null, 3)
+         .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
+         .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+         .replace(jsonLine, jsonPrettyPrint.replacer);
+      }
+   };
+
+$(document).ready(function() {
+
+	for (var i=0; i < 10; ++i) {
+		$("#selectable").append('<li id="now' + i + '" class="ui-widget-content  ui-corner-all">Now' + (i!==0? ' - ' + i : '') + '</li>');
+	}
+
+	$( function() {
+		$( "#selectable" ).selectable({
+			selected: function( event, ui ) {
+				const index = ui.selected.id.substring(3);
+				getInfoFromServer(index);
+			}
+		});
+	});
+
+	getPingInfoFromServer();
+
+	$( function() {
+    $( "#tabs" ).tabs();
+  } );
+
+	$( "#play").on("click",function() {
+			const command = $( this ).text().trim().toLowerCase();
+
+			$.ajax({
+			  type: "GET",
+			  url: "ping/" + command,
+			  success: updatePageData});
+
+		});
+});
+
+</script>
+
+</body>
+
+</html>

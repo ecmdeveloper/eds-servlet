@@ -1,10 +1,13 @@
 package com.ecmdeveloper.eds.servlet;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +23,9 @@ import com.ecmdeveloper.eds.model.ExternalDataResponse;
 import com.ecmdeveloper.eds.model.ObjectType;
 import com.ecmdeveloper.eds.model.impl.ExternalDataRequestImpl;
 import com.ecmdeveloper.eds.model.impl.ExternalDataResponseImpl;
+import com.ecmdeveloper.eds.model.impl.PingInfo;
+import com.ecmdeveloper.eds.model.impl.TraceItem;
+import com.ecmdeveloper.eds.model.impl.TraceItems;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -40,8 +46,8 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 	
 	private ObjectMapper mapper = new ObjectMapper();
 	
-	private static LinkedList<String> traceList = new LinkedList<String>();
-	private static String pingInfo = "";
+	private static TraceItems traceItems = new TraceItems(TRACE_LIST_SIZE);
+	private static PingInfo pingInfo = new PingInfo();
 	
 	private static final long serialVersionUID = 1L;
        
@@ -57,10 +63,8 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 		
 		mapper.addMixInAnnotations(ExternalDataRequest.class, ExternalDataRequestImpl.class);
 		
-		if ( pingInfo.isEmpty() ) {
-			SimpleDateFormat sdf = new SimpleDateFormat();
-			pingInfo = "EDS Servlet started at " + sdf.format( new Date() );
-		}
+		SimpleDateFormat sdf = new SimpleDateFormat();
+		pingInfo.setStartTimeInfo( "EDS Servlet started at " + sdf.format( new Date() ) );
     }
   
 	/**
@@ -81,24 +85,54 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 		}
 	}
 
+	private void streamResource(HttpServletResponse response, String resource) throws IOException {
+	
+	    PrintWriter writer = response.getWriter();
+		InputStream inputStream = this.getClass().getResourceAsStream(resource);
+
+		if ( inputStream != null ) {
+		    InputStreamReader isr = new InputStreamReader(inputStream);
+		    BufferedReader reader = new BufferedReader(isr);
+		    String text;
+
+		    while ((text = reader.readLine()) != null) {
+		        writer.println(text);
+		    }
+		} else {
+			writer.println("Resource '" + resource + "' not found!");
+		}
+	}
+
 	private void getPingInfo(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
-		if ( request.getPathInfo() != null ) {
-			
-			int index;
-			try {
-				index = Integer.parseInt(request.getPathInfo().substring(1) );
-			} catch (NumberFormatException e) {
-				index = 0;
-			}
-			if ( index < traceList.size() ) {
-				response.getWriter().write(traceList.get(index) );
+		String pathInfo = request.getPathInfo();
+		
+		if ( pathInfo != null ) {
+			if (pathInfo.equals("/info") ) {
+		        mapper.writeValue(response.getWriter(), pingInfo);
+			} else if ( pathInfo.equals("/start") ) {
+				pingInfo.setTraceStarted(true);
+		        mapper.writeValue(response.getWriter(), pingInfo);
+			} else if (pathInfo.equals("/stop") ) {
+				pingInfo.setTraceStarted(false);
+		        mapper.writeValue(response.getWriter(), pingInfo);
 			} else {
-				response.getWriter().write("{\"request\": {}, \"response\": {}, \"timestamp\": \"No data\"}");
+				int index = parseIndex(request);
+				mapper.writeValue(response.getWriter(), traceItems.get(index) );
 			}
 		} else {
-			response.getWriter().write(pingInfo);
+			streamResource(response, "/com/ecmdeveloper/eds/ping/index.html");		
 		}
+	}
+
+	private int parseIndex(HttpServletRequest request) {
+		int index;
+		try {
+			index = Integer.parseInt(request.getPathInfo().substring(1) );
+		} catch (NumberFormatException e) {
+			index = 0;
+		}
+		return index;
 	}
 
 	private ObjectType[] getObjectTypes(String repositoryId) {
@@ -144,16 +178,14 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 	private void addTrace(ExternalDataRequest dataRequest,
 			Object dataResponse) throws JsonProcessingException {
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
-		
-		String lastResponse = "{ \"request\": " + mapper.writeValueAsString(dataRequest == null? "{}" : dataRequest ) + 
-							", \"response\": " + mapper.writeValueAsString(dataResponse) +
-							", \"timestamp\": \"" + dataRequest.getObjectType() + " at " + dateFormat.format(new Date() ) + "\"" +
-							"}";
-		
-		traceList.addFirst(lastResponse);
-		if ( traceList.size() > TRACE_LIST_SIZE ) {
-			traceList.removeLast();
+		if (pingInfo.isTraceStarted() ) {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
+			
+			TraceItem lastResponse = new TraceItem(mapper.writeValueAsString(dataRequest == null? "{}" : dataRequest ), 
+								 mapper.writeValueAsString(dataResponse),
+								dataRequest.getObjectType() + " at " + dateFormat.format(new Date() ) );
+			
+			traceItems.add(lastResponse);
 		}
 	}
 
@@ -169,13 +201,25 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 	}
 	
 	/**
-	 * Handles the requests to the External Data Server. Subclasses should implement this method.
+	 * Handles the requests to the External Data Server. Subclasses should implement
+	 * this method.
 	 * 
-	 * @param dataRequest the object containing data request.
-	 * @param dataResponse the object receiving the data response.
+	 * @param dataRequest
+	 *            the object containing data request.
+	 * @param dataResponse
+	 *            the object receiving the data response.
 	 */
 	public abstract void handleRequest(ExternalDataRequest dataRequest, ExternalDataResponse dataResponse);
 	
+	/**
+	 * Returns the names of the all the object types handled by this servlet. This
+	 * is only relevant for IBM Content Navigator implementations.
+	 * 
+	 * @param repositoryId
+	 *            the id of the repository.
+	 * 
+	 * @return a list of object types handled by this servlet.
+	 */
 	public String[] getObjectTypeNames(String repositoryId) {
 		return new String[0];
 	}
