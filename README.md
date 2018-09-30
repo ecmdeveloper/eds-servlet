@@ -48,7 +48,7 @@ The `handleRequest()` method is where all the magic happens. This is where the a
 of your EDS service should take place. The incoming parameter ```dataRequest``` contains information
 about the request that is made, and the `dataResponse` object should be filled up by the implementation, describing the behavior of the different properties. You can use the ```getProperty()``` method with the symbolic name of the property to get a `Property` object. This object contains several methods to describe the required behavior.
 
-## A simple example
+## A simple Case Manager example
 
 Let's start with a simple *IBM Case Manager* use case. A solution has a case type ```Customer``` containing the property `EDSX_Name`. We want to make this property editable and
 required with a default value when we create a new case and readonly after the case is created.
@@ -86,7 +86,7 @@ object, otherwise nothing happens. This is all it takes to build a simple EDS im
 
 See the complete class for this example [here](https://github.com/ecmdeveloper/eds-servlet/blob/master/eds-servlet-example/src/main/java/com/ecmdeveloper/eds/example/servlet/EDSExampleServlet.java)
 
-## A simple Content Navigator examples
+## A simple Content Navigator example
 
 The *IBM Content Navigator* EDS is a little bit more involved. In this case you have to
 provide an implementation for the `getObjectTypeNames()` method of the `AbstractEDSServlet` class.
@@ -185,7 +185,7 @@ choices.add( adults );
 List<Choice> kidsChoices = new ArrayList<Choice>();
 kidsChoices.add( new Choice("Meg") );
 kidsChoices.add( new Choice("Chris") );
-kidsChoices.add( new Choice("Chris") );
+kidsChoices.add( new Choice("Stewie") );
 
 Choice kids = new Choice("Kids");
 kids.setChoices(kidsChoices);
@@ -196,14 +196,4 @@ choiceList.setChoices(choices);
 
 ## Reference
 
-### ExternalDataRequest
-
-Method | Description
--------|------------
-`String getObjectId()`|The globally unique identifier (GUID) or persistent identifier (PID) that identifies the item that is being edited.
-`String getObjectId()`|The object type of the item that is being edited.
-`String getRepositoryId()`|The name of the target external data store that contains the property data.
-`RequestMode getRequestMode()` | Returns the  reason that the service is being called. The value can be one of these value: `initialNewObject`, `initialExistingObject`, `inProgressChanges`,`finalNewObject` or `finalExistingObject`
-` Map<String, Object> getClientContext()`|An array that contains a series of key value pairs that specify contextual information for a specific class or item type.
-`Property getProperty(String name)`|Returns a specific property identified by it's symbolic name
-`String getExternalDataIdentifier()`|A string that indicates the state of the data that was returned by the external data service. The request must include this identifier if the `requestMode` parameter is set to one of these values: `inProgressChanges`, `finalNewObject` or `finalExistingObject`
+The javadoc documentation for this API can be found [here](http://ecmdeveloper.com/eds-servlet/).
