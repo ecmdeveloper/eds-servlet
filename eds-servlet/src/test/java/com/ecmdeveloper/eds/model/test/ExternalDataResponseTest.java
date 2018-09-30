@@ -3,7 +3,7 @@
  */
 package com.ecmdeveloper.eds.model.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,11 +11,11 @@ import java.io.IOException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.ecmdeveloper.eds.model.ErrorResponse;
 import com.ecmdeveloper.eds.model.ExternalDataRequest;
 import com.ecmdeveloper.eds.model.ExternalDataResponse;
 import com.ecmdeveloper.eds.model.Property;
 import com.ecmdeveloper.eds.model.constants.DisplayMode;
-import com.ecmdeveloper.eds.model.constants.RequestMode;
 import com.ecmdeveloper.eds.model.impl.ExternalDataRequestImpl;
 import com.ecmdeveloper.eds.model.impl.ExternalDataResponseImpl;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -39,7 +39,7 @@ public class ExternalDataResponseTest {
 
 	@Test
 	public void test() throws JsonParseException, JsonMappingException, IOException {			
-		File file = new File("src\\test\\resources\\request.json");
+		File file = new File("/Users/ricardobelfor/git/eds-servlet/eds-servlet/src/test/resources/request.json");
 		ExternalDataRequest dataRequest = mapper.readValue(file, ExternalDataRequestImpl.class);
 			
 		Property creator = dataRequest.getProperty("Creator");
@@ -53,5 +53,17 @@ public class ExternalDataResponseTest {
 		
 		assertEquals("{\"externalDataIdentifier\":\"EDS API\",\"properties\":[{\"symbolicName\":\"Creator\",\"displayMode\":\"readonly\",\"required\":true}]}",
 					 mapper.writeValueAsString(dataResponse) );
+	}
+	
+	@Test
+	public void errorResponseTest() throws Exception {
+		ErrorResponse errorResponse = new ErrorResponse();
+		errorResponse.setText("Oops, this is an error");
+		
+		for ( StackTraceElement element : Thread.currentThread().getStackTrace() ) {
+			errorResponse.addCause(element.toString());
+		}
+		mapper.writeValue(System.out, errorResponse);
+		
 	}
 }

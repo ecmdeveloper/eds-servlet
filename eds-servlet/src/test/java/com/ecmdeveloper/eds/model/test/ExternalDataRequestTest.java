@@ -37,7 +37,7 @@ public class ExternalDataRequestTest {
 
 	@Test
 	public void test() throws JsonParseException, JsonMappingException, IOException {			
-		File file = new File("src\\test\\resources\\request.json");
+		File file = new File("/Users/ricardobelfor/git/eds-servlet/eds-servlet/src/test/resources/request.json");
 		ExternalDataRequest dataRequest = mapper.readValue(file, ExternalDataRequestImpl.class);
 		assertEquals(RequestMode.initialNewObject, dataRequest.getRequestMode());
 		assertEquals("TARGET", dataRequest.getRepositoryId());
