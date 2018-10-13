@@ -194,6 +194,27 @@ choices.add( kids );
 choiceList.setChoices(choices);
 ```
 
+## Debugging
+
+Debugging the EDS component can be very cumbersome. The client contains some optimizations and caches
+some of the information provided by the EDS component. It is therefore very handy to know the different
+requests made from the client and the responses provided by your implementation. To accomplish this
+the servlet serves a ping page. The ping page can be enable by adding an URL pattern for the ping page. The declaration of your class extending `AbstractEDSServlet` class should now look like this:
+
+```java
+@WebServlet(description = "An example of an EDS servlet.",
+            urlPatterns = { "/type/*", "/types", "/ping"})
+public class EDSExampleServlet extends AbstractEDSServlet {
+
+	  // The rest is unchanged...
+}
+```
+
+In the ping page you can now turn tracing on and off. If you turn tracing on then you can inspect the ten last requests made to your EDS component.
+
+![ping_page](http://www.ecmdeveloper.com/img/posts/ping-page.png)
+
+
 ## Reference
 
 The javadoc documentation for this API can be found [here](http://ecmdeveloper.com/eds-servlet/).
