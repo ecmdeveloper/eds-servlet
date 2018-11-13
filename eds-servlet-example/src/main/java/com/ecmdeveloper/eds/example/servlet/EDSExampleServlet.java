@@ -12,6 +12,7 @@ import com.ecmdeveloper.eds.model.ChoiceList;
 import com.ecmdeveloper.eds.model.ExternalDataRequest;
 import com.ecmdeveloper.eds.model.ExternalDataResponse;
 import com.ecmdeveloper.eds.model.Property;
+import com.ecmdeveloper.eds.model.constants.DisplayMode;
 import com.ecmdeveloper.eds.servlet.AbstractEDSServlet;
 
 /**
@@ -48,7 +49,7 @@ public class EDSExampleServlet extends AbstractEDSServlet {
 		} else {
 					
 			Property name = dataRequest.getProperty("TST_ExternalProperty1");
-			name.setRequired(true);
+			name.setDisplayMode(DisplayMode.readonly);
 			name.setValue("John Doe");
 			dataResponse.addProperty(name);
 			

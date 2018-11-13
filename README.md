@@ -1,6 +1,6 @@
 # EDS servlet
 This is a library you can use to build an External Data Services servlet for IBM FileNet
-Case Manager and IBM FileNet Content Navigator.
+Case Manager and IBM FileNet Content Navigator. It uses the [Jackson libraries](https://github.com/FasterXML/jackson) to do all the JSON conversions.
 
 ## Getting started
 
@@ -21,6 +21,8 @@ If this is not possible then you have to add the jar-file and it's dependencies 
 to your project. The files can be found here:
 
 TODO: add location of jar-file and dependencies.
+
+> To support Java 6 installation the latest version of Jackson supporting Java 6, version 2.6.7, is used.
 
 The next step is to add a servlet to your project. This servlet must be a subclass
 of the class `com.ecmdeveloper.eds.servlet.AbstractEDSServlet` and should include
