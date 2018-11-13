@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.ecmdeveloper</groupId>
+	<groupId>com.github.ecmdeveloper</groupId>
 	<artifactId>eds-servlet</artifactId>
 	<version>1.0.0</version>
 	<name>EDS servlet</name>
@@ -34,17 +34,17 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.4.4</version>
+			<version>2.6.7.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>2.4.4</version>
+			<version>2.6.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
-			<version>2.4.4</version>
+			<version>2.6.7</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
