@@ -11,16 +11,19 @@ to the EDS servlet API to your pom-file:
 
 ```xml
 <dependency>
-    <groupId>com.ecmdeveloper</groupId>
+    <groupId>com.github.ecmdeveloper</groupId>
     <artifactId>eds-servlet</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
 
 If this is not possible then you have to add the jar-file and it's dependencies manually
-to your project. The files can be found here:
+to the `WEB-INF/lib`  folder of your project. The files can be found here:
 
-TODO: add location of jar-file and dependencies.
+- [EDS Servlet 1.0.0](http://repo2.maven.org/maven2/com/github/ecmdeveloper/eds-servlet/1.0.0/eds-servlet-1.0.0.jar)
+- [Jackson Core 2.6.7](http://repo2.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.6.7/jackson-core-2.6.7.jar)
+- [Jackson Databind 2.6.7.1](http://central.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.6.7.1/jackson-databind-2.6.7.1.jar)
+- [Jackson Annotations 2.6.7](http://central.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.6.7/jackson-annotations-2.6.7.jar)
 
 > To support Java 6 installation the latest version of Jackson supporting Java 6, version 2.6.7, is used.
 
