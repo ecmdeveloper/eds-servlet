@@ -12,21 +12,25 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ecmdeveloper.eds.model.ErrorResponse;
 import com.ecmdeveloper.eds.model.ExternalDataRequest;
 import com.ecmdeveloper.eds.model.ExternalDataResponse;
 import com.ecmdeveloper.eds.model.ObjectType;
+import com.ecmdeveloper.eds.model.impl.ErrorInfo;
+import com.ecmdeveloper.eds.model.impl.ErrorResponse;
 import com.ecmdeveloper.eds.model.impl.ExternalDataRequestImpl;
 import com.ecmdeveloper.eds.model.impl.ExternalDataResponseImpl;
 import com.ecmdeveloper.eds.model.impl.PingInfo;
 import com.ecmdeveloper.eds.model.impl.TraceItem;
 import com.ecmdeveloper.eds.model.impl.TraceItems;
+import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -68,13 +72,15 @@ public abstract class AbstractEDSServlet extends HttpServlet {
     }
   
 	/**
-	 * Returns the names of the object types handled by this EDS implementation. The id of the
-	 * repository is passed as a parameter. Also handles the requests from the ping page.
+	 * Returns the names of the object types handled by this EDS implementation. The
+	 * id of the repository is passed as a parameter. Also handles the requests from
+	 * the ping page.
 	 * 
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+		
 		String servletPath = request.getServletPath();
 		
 		if ("/types".equals( servletPath ) ) {
@@ -83,6 +89,13 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 		} else if ("/ping".equals( servletPath ) ) {
 			getPingInfo(request, response);
 		}
+	}
+
+	private void getErrorAsJson(HttpServletRequest request, HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException {
+		final String message = (String) request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
+		final ErrorResponse errorInfo = new ErrorResponse();
+		errorInfo.setText(message);
+		mapper.writeValue(response.getWriter(), errorInfo);
 	}
 
 	private void streamResource(HttpServletResponse response, String resource) throws IOException {
@@ -146,10 +159,21 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * Method handling the POST requests. A a default it will handle the
+	 * <tt>/type</tt> request. In case of an error it will also handle the
+	 * <tt>/error</tt> request.
+	 * 
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		String servletPath = request.getServletPath();
+		
+		if ( "/error".equals(servletPath) ) {
+			getErrorAsJson(request, response);
+			return;
+		}
 		ExternalDataRequestImpl dataRequest = null;
 
 		try {
@@ -167,10 +191,8 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 
 			logger.exiting(SOURCE_CLASS, "doPost");
 		} catch (Exception e ) {
-			response.sendError(500);
-		    ErrorResponse errorResponse = getErrorResponse(e);
-			addTrace(dataRequest, errorResponse);
-			mapper.writeValue(response.getWriter(), errorResponse );
+			response.sendError(500, e.getLocalizedMessage() );
+			addTrace(dataRequest, getErrorInfo(e) );
 			logger.log(Level.SEVERE, getServletName() +":doPost", e);
 		}
 	}
@@ -189,15 +211,14 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 		}
 	}
 
-	private ErrorResponse getErrorResponse(Exception e) {
-		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setText(e.getLocalizedMessage() );
+	private ErrorInfo getErrorInfo(Exception e) {
+		ErrorInfo errorInfo = new ErrorInfo(e.getLocalizedMessage() );
 		
 		StackTraceElement[] stack = e.getStackTrace();
 		for (StackTraceElement s : stack) {
-			errorResponse.addCause(s.toString());
+			errorInfo.addCause(s.toString());
 		}
-		return errorResponse;
+		return errorInfo;
 	}
 	
 	/**

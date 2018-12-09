@@ -11,11 +11,11 @@ import java.io.IOException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.ecmdeveloper.eds.model.ErrorResponse;
 import com.ecmdeveloper.eds.model.ExternalDataRequest;
 import com.ecmdeveloper.eds.model.ExternalDataResponse;
 import com.ecmdeveloper.eds.model.Property;
 import com.ecmdeveloper.eds.model.constants.DisplayMode;
+import com.ecmdeveloper.eds.model.impl.ErrorResponse;
 import com.ecmdeveloper.eds.model.impl.ExternalDataRequestImpl;
 import com.ecmdeveloper.eds.model.impl.ExternalDataResponseImpl;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -60,9 +60,9 @@ public class ExternalDataResponseTest {
 		ErrorResponse errorResponse = new ErrorResponse();
 		errorResponse.setText("Oops, this is an error");
 		
-		for ( StackTraceElement element : Thread.currentThread().getStackTrace() ) {
-			errorResponse.addCause(element.toString());
-		}
+//		for ( StackTraceElement element : Thread.currentThread().getStackTrace() ) {
+//			errorResponse.addCause(element.toString());
+//		}
 		mapper.writeValue(System.out, errorResponse);
 		
 	}
