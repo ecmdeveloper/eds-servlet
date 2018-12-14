@@ -21,11 +21,11 @@ If this is not possible then you have to add the jar-file and it's dependencies 
 to the `WEB-INF/lib`  folder of your project. The files can be found here:
 
 - [EDS Servlet 1.0.0](http://repo2.maven.org/maven2/com/github/ecmdeveloper/eds-servlet/1.0.0/eds-servlet-1.0.0.jar)
-- [Jackson Core 2.6.7](http://repo2.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.6.7/jackson-core-2.6.7.jar)
-- [Jackson Databind 2.6.7.1](http://central.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.6.7.1/jackson-databind-2.6.7.1.jar)
-- [Jackson Annotations 2.6.7](http://central.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.6.7/jackson-annotations-2.6.7.jar)
+- [Jackson Core 2.9.7](http://repo2.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.9.7/jackson-core-2.9.7.jar)
+- [Jackson Databind 2.9.7](http://central.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.9.7/jackson-databind-2.9.7.jar)
+- [Jackson Annotations 2.9.7](http://central.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.9.7/jackson-annotations-2.9.7.jar)
 
-> To support Java 6 installation the latest version of Jackson supporting Java 6, version 2.6.7, is used.
+> These versions of Jackson are for Java 8 and higher. To support Java 6 installation the latest version of Jackson supporting Java 6, version 2.6.7, can be used.
 
 The next step is to add a servlet to your project. This servlet must be a subclass
 of the class `com.ecmdeveloper.eds.servlet.AbstractEDSServlet` and should include
@@ -219,6 +219,54 @@ In the ping page you can now turn tracing on and off. If you turn tracing on the
 
 ![ping_page](http://www.ecmdeveloper.com/img/posts/ping-page.png)
 
+## Custom Error Messages
+
+When your EDS component throws an exception, this exception will show up in the log-files on the server. The error will also show up in the ping page if tracing is started. Out of the box the feedback to the user will be a dialog box with the following message:
+
+![content navigator standard error](http://www.ecmdeveloper.com/img/posts/content_navigator_standard_error.png)
+
+This information does not convey the nature of the error to the user. You might for instance use the Java exception mechanism to tell user that some complicated validation is not met when adding a new object. This library also has support for this situation. Setting this up is a little bit more involved. This is because of the fact that the servlet specification states the an HTTP 500 response should be wrapped in an HTML page. However, the EDS infrastructure expects that the error information is served in JSON format. This can be accomplished with custom error pages.  
+
+First The declaration of your class extending `AbstractEDSServlet` class should also support the `/error` path. Therefore it is added to the `urlPatterns` annotation:
+
+```java
+@WebServlet(description = "An example of an EDS servlet.",
+            urlPatterns = { "/type/*", "/types", "/ping", "/error"})
+public class EDSExampleServlet extends AbstractEDSServlet {
+
+	  // The rest is unchanged...
+}
+```
+This path should also be connected to an HTTP 500 response in your `web.xml` file (up to now we did not need this file):
+
+```xml
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+	      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	      version="3.0">
+	      
+	<error-page>
+	  <error-code>500</error-code>
+	  <location>/error</location>
+	</error-page>
+	      
+</web-app>
+```
+Now the `AbstractEDSServlet` class will make sure that your error message is served in JSON format when you throw an exeption. As an example consider the following, not very useful, code, preventing adding new objects:
+
+```java
+if (dataRequest.getRequestMode().equals(RequestMode.finalNewObject) ) {
+	throw new RuntimeException("The time is now " + (new Date()).toString() );
+}
+```
+This will give the following error dialog in the IBM Case Manager interface:
+
+![case manager error](http://www.ecmdeveloper.com/img/posts/case_manager_error.png)
+
+and this error dialog in the IBM Content Navigator interface:
+
+![content navigator error](http://www.ecmdeveloper.com/img/posts/content_navigator_error.png)
 
 ## Reference
 
