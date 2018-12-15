@@ -212,13 +212,13 @@ public abstract class AbstractEDSServlet extends HttpServlet {
 	}
 
 	private ErrorInfo getErrorInfo(Exception e) {
-		ErrorInfo errorInfo = new ErrorInfo(e.getLocalizedMessage() );
+		ErrorInfo errorResponse = new ErrorInfo(e.getLocalizedMessage() );
 		
 		StackTraceElement[] stack = e.getStackTrace();
 		for (StackTraceElement s : stack) {
-			errorInfo.addCause(s.toString());
+			errorResponse.addCause(s.toString());
 		}
-		return errorInfo;
+		return errorResponse;
 	}
 	
 	/**
