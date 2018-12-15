@@ -13,6 +13,7 @@ import com.ecmdeveloper.eds.model.ExternalDataRequest;
 import com.ecmdeveloper.eds.model.ExternalDataResponse;
 import com.ecmdeveloper.eds.model.Property;
 import com.ecmdeveloper.eds.model.constants.DisplayMode;
+import com.ecmdeveloper.eds.model.constants.RequestMode;
 import com.ecmdeveloper.eds.servlet.AbstractEDSServlet;
 
 /**
@@ -21,7 +22,7 @@ import com.ecmdeveloper.eds.servlet.AbstractEDSServlet;
  */
 @WebServlet(
 		description = "An example of an EDS servlet.", 
-		urlPatterns = { "/type/*", "/types", "/ping/*"
+		urlPatterns = { "/type/*", "/types", "/error", "/ping/*"
 		})
 public class EDSExampleServlet extends AbstractEDSServlet {
 	
@@ -31,11 +32,12 @@ public class EDSExampleServlet extends AbstractEDSServlet {
 	public void handleRequest(ExternalDataRequest dataRequest, ExternalDataResponse dataResponse) {
 		
 		if ( dataRequest.getObjectType().equals("TST_testDocType") ) {
+			
 			Property test = dataRequest.getProperty("TST_TestProp");
-			test.setValue("Hallo, Zaterdag!");
+			test.setValue( "This is the default value" );
 			dataResponse.addProperty(test);
 			
-			Property department = dataRequest.getProperty("TST_Department");
+			Property department = dataRequest.getProperty("TST_Departement");
 			ChoiceList choiceList = new ChoiceList();
 			choiceList.setDisplayName("Departments");
 			
@@ -44,20 +46,28 @@ public class EDSExampleServlet extends AbstractEDSServlet {
 				choices.add( new Choice(name) );
 			}
 			choiceList.setChoices(choices);
+			department.setChoiceList(choiceList);
+			dataResponse.addProperty(department);
 			
-//			throw new RuntimeException("The time is now " + (new Date()).toString() );
-		} else {
+		} else if (dataRequest.getObjectType().equals("Customer") ) {
 					
 			Property name = dataRequest.getProperty("TST_ExternalProperty1");
 			name.setDisplayMode(DisplayMode.readonly);
 			name.setValue("John Doe");
 			dataResponse.addProperty(name);
 			
+		} else if (dataRequest.getObjectType().equals("Email") ) {
+
+			Property from = dataRequest.getProperty("From");
+			from.setValue("john.doe@example.com");
+			from.setFormat("^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$");
+			from.setFormatDescription("e-mail address");
+			dataResponse.addProperty(from);
 		}
 	}
 
 	@Override
 	public String[] getObjectTypeNames(String repositoryId) {
-		return new String[] {"TST_testDocType" };
+		return new String[] {"Email" };
 	}
 }

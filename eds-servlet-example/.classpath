@@ -23,5 +23,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/Users/ricardobelfor/Dropbox/edsPlugin.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
