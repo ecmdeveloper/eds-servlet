@@ -88,6 +88,7 @@ Now that the context is determined, we can start to modify the `Property` object
 it required and editable on create, and readonly afterwards. At
 the end there is one important thing: the property must be added to the `dataResponse`
 object, otherwise nothing happens. This is all it takes to build a simple EDS implementation.
+The [Javadoc of the `Property` object](http://ecmdeveloper.com/eds-servlet/com/ecmdeveloper/eds/model/Property.html) gives a good overview of all the possible customization you can perform.
 
 See the complete class for this example [here](https://github.com/ecmdeveloper/eds-servlet/blob/master/eds-servlet-example/src/main/java/com/ecmdeveloper/eds/example/servlet/EDSExampleServlet.java)
 
