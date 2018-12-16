@@ -209,7 +209,7 @@ the servlet serves a ping page. The ping page can be enable by adding an URL pat
 
 ```java
 @WebServlet(description = "An example of an EDS servlet.",
-            urlPatterns = { "/type/*", "/types", "/ping"})
+            urlPatterns = { "/type/*", "/types", "/ping/*"})
 public class EDSExampleServlet extends AbstractEDSServlet {
 
 	  // The rest is unchanged...
@@ -232,7 +232,7 @@ First The declaration of your class extending `AbstractEDSServlet` class should 
 
 ```java
 @WebServlet(description = "An example of an EDS servlet.",
-            urlPatterns = { "/type/*", "/types", "/ping", "/error"})
+            urlPatterns = { "/type/*", "/types", "/ping/*", "/error"})
 public class EDSExampleServlet extends AbstractEDSServlet {
 
 	  // The rest is unchanged...
