@@ -1,2 +1,6 @@
+.project
+.classpath
+.settings/
+build.sh
 /target/
 /Users/
